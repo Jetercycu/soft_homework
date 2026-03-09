@@ -1,138 +1,103 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>氣泡排序視覺化</title>
-  <style>
-    body {
-      background-color: #333;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    h2 {
-      text-align: center;
-    }
-    .controls label {
-      color: white;
-    }
-    .footer {
-      color: white;
-      margin-top: 10px;
-      font-size: 13px;
-    }
-    .home-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #00f;
-      text-decoration: underline;
-    }
-    #container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      height: 300px;
-      margin-top: 20px;
-      border: 1px solid white;
-      background-color: #444;
-    }
-    .bar {
-      margin: 0 2px;
-      background-color: #00f;
-      width: 20px;
-      transition: height 0.2s;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>氣泡排序法示範</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        #controls {
+            margin-bottom: 20px;
+        }
+        #arrayContainer {
+            display: flex;
+            gap: 5px;
+            align-items: flex-end;
+            height: 50vh; /* 陣列區域最大佔據頁面高度一半 */
+        }
+        .bar {
+            width: 30px;
+            background-color: #4CAF50;
+            text-align: center;
+            color: white;
+        }
+        #homeLink {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div>
-    <h2>氣泡排序視覺化</h2>
-    <div class="controls">
-      <label>數量: <input id="numInput" type="number" min="2" max="50" value="10"></label>
-      <label>速度(ms): <input id="speedInput" type="range" min="10" max="1000" value="120"></label>
-      <button id="genBtn">產生陣列</button>
-      <button id="startBtn">開始排序</button>
-      <button id="shuffleBtn">隨機重排</button>
+    <a id="homeLink" href="./" title="返回首頁">⬅️ 返回首頁</a>
+    <div id="controls">
+        陣列大小: <input type="number" id="sizeInput" min="2" max="10" value="5">
+        <button id="generateBtn">生成陣列</button>
+        <button id="sortBtn">開始排序</button>
     </div>
+    <div id="arrayContainer"></div>
 
-    <div id="container"></div>
-    <div class="footer">說明: 調整數量後按「產生陣列」，再按「開始排序」。</div>
-    <a href="index.html" class="home-link">回首頁</a>
-  </div>
+    <script>
+        const sizeInput = document.getElementById('sizeInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const sortBtn = document.getElementById('sortBtn');
+        const container = document.getElementById('arrayContainer');
+        let arr = [];
 
-  <script>
-    const container = document.getElementById('container');
-    const numInput = document.getElementById('numInput');
-    const genBtn = document.getElementById('genBtn');
-    const startBtn = document.getElementById('startBtn');
-    const speedInput = document.getElementById('speedInput');
-
-    let bars = [];
-    let delay = parseInt(speedInput.value, 10);
-
-    // 生成隨機陣列並顯示條狀圖
-    function generateArray() {
-      const numBars = parseInt(numInput.value, 10);
-      const array = Array.from({ length: numBars }, () => Math.floor(Math.random() * 100) + 1);
-
-      // 清空容器
-      container.innerHTML = '';
-
-      // 動態生成條狀圖
-      bars = array.map(value => {
-        const bar = document.createElement('div');
-        bar.classList.add('bar');
-        bar.style.height = `${value * 3}px`; // 調整高度比例
-        container.appendChild(bar);
-        return bar;
-      });
-    }
-
-    // 氣泡排序動畫
-    async function bubbleSort() {
-      const n = bars.length;
-      for (let i = 0; i < n - 1; i++) {
-        for (let j = 0; j < n - i - 1; j++) {
-          bars[j].style.backgroundColor = 'red';
-          bars[j + 1].style.backgroundColor = 'red';
-
-          const height1 = parseInt(bars[j].style.height, 10);
-          const height2 = parseInt(bars[j + 1].style.height, 10);
-
-          if (height1 > height2) {
-            await swapBars(j, j + 1);
-          }
-
-          bars[j].style.backgroundColor = '#00f';
-          bars[j + 1].style.backgroundColor = '#00f';
+        function renderArray() {
+            container.innerHTML = '';
+            if (arr.length === 0) return;
+            const maxVal = Math.max(...arr);
+            arr.forEach(val => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                const heightPercent = (val / maxVal) * 100;
+                bar.style.height = heightPercent + '%';
+                bar.textContent = val;
+                container.appendChild(bar);
+            });
         }
-      }
-    }
 
-    // 交換條狀圖高度
-    function swapBars(index1, index2) {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const tempHeight = bars[index1].style.height;
-          bars[index1].style.height = bars[index2].style.height;
-          bars[index2].style.height = tempHeight;
-          resolve();
-        }, delay);
-      });
-    }
+        function generateArray() {
+            const size = Math.min(10, Math.max(2, parseInt(sizeInput.value) || 2));
+            arr = [];
+            for (let i = 0; i < size; i++) {
+                arr.push(Math.floor(Math.random() * 90) + 10);
+            }
+            renderArray();
+        }
 
-    // 更新速度
-    speedInput.addEventListener('input', () => {
-      delay = parseInt(speedInput.value, 10);
-    });
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
-    // 綁定按鈕事件
-    genBtn.addEventListener('click', generateArray);
-    startBtn.addEventListener('click', bubbleSort);
+        async function bubbleSort() {
+            const bars = container.children;
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr.length - i - 1; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        renderArray();
+                        await sleep(300);
+                    }
+                }
+            }
+        }
 
-    // 初始化
-    generateArray();
-  </script>
+        generateBtn.addEventListener('click', generateArray);
+        sortBtn.addEventListener('click', () => {
+            bubbleSort();
+        });
+
+        // initialize
+        generateArray();
+    </script>
 </body>
 </html>
