@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>氣泡排序視覺化</title>
+  <style>
+    body {
+      background-color: #333;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    h2 {
+      text-align: center;
+    }
+    .controls label {
+      color: white;
+    }
+    .footer {
+      color: white;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h2>氣泡排序視覺化</h2>
+    <div class="controls">
+      <label>數量: <input id="numInput" type="number" min="2" max="50" value="10"></label>
+      <label>速度(ms): <input id="speedInput" type="range" min="10" max="1000" value="120"></label>
+      <button id="genBtn">產生陣列</button>
+      <button id="startBtn">開始排序</button>
+      <button id="shuffleBtn">隨機重排</button>
+    </div>
+
+    <div id="container"></div>
+    <div class="footer">說明: 調整數量後按「產生陣列」，再按「開始排序」。</div>
+  </div>
+
+  <script>
+    const container = document.getElementById('container');
+    // 需要補充生成條狀圖和排序邏輯
+  </script>
+</body>
+</html>
