@@ -103,7 +103,7 @@
             </select>
             <button id="generate-btn">生成新陣列</button>
             <button id="sort-btn">開始排序</button>
-            <label for="speed">排序速度:</label>
+            <label for="speed">排序速度倍數:</label>
             <input type="range" id="speed" min="10" max="1000" value="100" step="10">
             <button id="home-btn">回首頁</button>
             <div class="time-display">花費時間: <span id="time">0</span> 秒</div>
@@ -126,7 +126,7 @@
                 <span>已排序</span>
             </div>
             <div class="legend-item">
-                <span>當前速度: <span id="speed-value">1</span> 倍</span>
+                <span>當前速度倍數: <span id="speed-value">1</span> 倍</span>
             </div>
         </div>
     </div>
@@ -211,7 +211,7 @@
 
         speedInput.addEventListener('input', () => {
             sortSpeed = parseInt(speedInput.value);
-            speedValueSpan.textContent = (sortSpeed / 100).toFixed(1);
+            speedValueSpan.textContent = (100 / sortSpeed).toFixed(1);
         });
 
         generateBtn.addEventListener('click', generateArray);
@@ -222,7 +222,7 @@
 
         // 初始化
         generateArray();
-        speedValueSpan.textContent = (sortSpeed / 100).toFixed(1);
+        speedValueSpan.textContent = (100 / sortSpeed).toFixed(1);
     </script>
 </body>
 </html>
