@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選擇排序法示範</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: calc(100vw * 2 / 3);
+            max-width: 800px;
+        }
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ccc;
+            background-color: white;
+            margin-bottom: 20px;
+        }
+        .bar {
+            width: 30px;
+            background-color: #4CAF50;
+            margin: 0 2px;
+            transition: height 0.3s;
+            position: relative;
+        }
+        .bar-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+        }
+        select, button {
+            padding: 8px 12px;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        .time-display {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>選擇排序法示範</h1>
+        <div class="array-container" id="array-container"></div>
+        <div class="controls">
+            <label for="array-size">陣列數量:</label>
+            <select id="array-size">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+            <button id="generate-btn">生成新陣列</button>
+            <button id="sort-btn">開始排序</button>
+            <button id="home-btn">回首頁</button>
+            <div class="time-display">花費時間: <span id="time">0</span> ms</div>
+        </div>
+    </div>
+
+    <script>
+        let array = [];
+        let arraySize = 10;
+        const arrayContainer = document.getElementById('array-container');
+        const arraySizeSelect = document.getElementById('array-size');
+        const generateBtn = document.getElementById('generate-btn');
+        const sortBtn = document.getElementById('sort-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const timeSpan = document.getElementById('time');
+
+        function generateArray() {
+            array = [];
+            for (let i = 0; i < arraySize; i++) {
+                array.push(Math.floor(Math.random() * 100) + 1);
+            }
+            renderArray();
+        }
+
+        function renderArray() {
+            arrayContainer.innerHTML = '';
+            const maxValue = Math.max(...array);
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${(value / maxValue) * 100}%`;
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = value;
+                bar.appendChild(label);
+                arrayContainer.appendChild(bar);
+            });
+        }
+
+        async function selectionSort() {
+            const startTime = performance.now();
+            const bars = document.querySelectorAll('.bar');
+            for (let i = 0; i < array.length - 1; i++) {
+                let minIndex = i;
+                bars[i].style.backgroundColor = 'red'; // 當前位置
+                for (let j = i + 1; j < array.length; j++) {
+                    bars[j].style.backgroundColor = 'yellow'; // 比較中
+                    await sleep(100);
+                    if (array[j] < array[minIndex]) {
+                        if (minIndex !== i) bars[minIndex].style.backgroundColor = '#4CAF50';
+                        minIndex = j;
+                        bars[minIndex].style.backgroundColor = 'blue'; // 新最小
+                    } else {
+                        bars[j].style.backgroundColor = '#4CAF50';
+                    }
+                }
+                if (minIndex !== i) {
+                    // 交換
+                    [array[i], array[minIndex]] = [array[minIndex], array[i]];
+                    bars[i].style.height = `${(array[i] / Math.max(...array)) * 100}%`;
+                    bars[i].querySelector('.bar-label').textContent = array[i];
+                    bars[minIndex].style.height = `${(array[minIndex] / Math.max(...array)) * 100}%`;
+                    bars[minIndex].querySelector('.bar-label').textContent = array[minIndex];
+                }
+                bars[i].style.backgroundColor = 'green'; // 已排序
+                bars[minIndex].style.backgroundColor = '#4CAF50';
+            }
+            bars[array.length - 1].style.backgroundColor = 'green';
+            const endTime = performance.now();
+            timeSpan.textContent = (endTime - startTime).toFixed(2);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        arraySizeSelect.addEventListener('change', () => {
+            arraySize = parseInt(arraySizeSelect.value);
+            generateArray();
+        });
+
+        generateBtn.addEventListener('click', generateArray);
+        sortBtn.addEventListener('click', selectionSort);
+        homeBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // 初始化
+        generateArray();
+    </script>
+</body>
+</html>
