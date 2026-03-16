@@ -111,7 +111,7 @@
         <div class="legend">
             <div class="legend-item">
                 <div class="color-box" style="background-color: red;"></div>
-                <span>當前位置</span>
+                <span>最小值目標位置</span>
             </div>
             <div class="legend-item">
                 <div class="color-box" style="background-color: yellow;"></div>
@@ -172,7 +172,7 @@
             const bars = document.querySelectorAll('.bar');
             for (let i = 0; i < array.length - 1; i++) {
                 let minIndex = i;
-                bars[i].style.backgroundColor = 'red'; // 當前位置
+                bars[i].style.backgroundColor = 'red'; // 最小值目標位置
                 for (let j = i + 1; j < array.length; j++) {
                     bars[j].style.backgroundColor = 'yellow'; // 比較中
                     await sleep(sortSpeed);
