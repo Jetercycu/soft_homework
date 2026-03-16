@@ -66,6 +66,27 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +108,27 @@
             <button id="home-btn">回首頁</button>
             <div class="time-display">花費時間: <span id="time">0</span> 秒</div>
         </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: red;"></div>
+                <span>當前位置</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: yellow;"></div>
+                <span>比較中</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: blue;"></div>
+                <span>新最小</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: green;"></div>
+                <span>已排序</span>
+            </div>
+            <div class="legend-item">
+                <span>當前速度: <span id="speed-value">1</span> 倍</span>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -100,6 +142,7 @@
         const homeBtn = document.getElementById('home-btn');
         const speedInput = document.getElementById('speed');
         const timeSpan = document.getElementById('time');
+        const speedValueSpan = document.getElementById('speed-value');
 
         function generateArray() {
             array = [];
@@ -168,6 +211,7 @@
 
         speedInput.addEventListener('input', () => {
             sortSpeed = parseInt(speedInput.value);
+            speedValueSpan.textContent = (sortSpeed / 100).toFixed(1);
         });
 
         generateBtn.addEventListener('click', generateArray);
@@ -178,6 +222,7 @@
 
         // 初始化
         generateArray();
+        speedValueSpan.textContent = (sortSpeed / 100).toFixed(1);
     </script>
 </body>
 </html>
