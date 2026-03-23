@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插入排序法示範</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: calc(100vw * 2 / 3);
+            max-width: 800px;
+        }
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ccc;
+            background-color: white;
+            margin-bottom: 20px;
+        }
+        .bar {
+            width: 30px;
+            background-color: #4CAF50;
+            margin: 0 2px;
+            transition: height 0.3s;
+            position: relative;
+        }
+        .bar-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            flex-wrap: wrap;
+        }
+        select, button, input {
+            padding: 8px 12px;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        .time-display {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>插入排序法示範</h1>
+        <div class="array-container" id="array-container"></div>
+        <div class="controls">
+            <label for="array-size">陣列數量:</label>
+            <select id="array-size">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+            <button id="generate-btn">生成新陣列</button>
+            <button id="sort-btn">開始排序</button>
+            <label for="speed">排序速度倍數:</label>
+            <input type="range" id="speed" min="10" max="1000" value="100" step="10">
+            <button id="home-btn">回首頁</button>
+            <div class="time-display">花費時間: <span id="time">0</span> 秒</div>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: red;"></div>
+                <span>當前插入元素</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: yellow;"></div>
+                <span>比較中</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: blue;"></div>
+                <span>已排序部分</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: green;"></div>
+                <span>已完成</span>
+            </div>
+            <div class="legend-item">
+                <span>當前速度倍數: <span id="speed-value">1</span> 倍</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let array = [];
+        let arraySize = 10;
+        let sortSpeed = 100;
+        const arrayContainer = document.getElementById('array-container');
+        const arraySizeSelect = document.getElementById('array-size');
+        const generateBtn = document.getElementById('generate-btn');
+        const sortBtn = document.getElementById('sort-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const speedInput = document.getElementById('speed');
+        const timeSpan = document.getElementById('time');
+        const speedValueSpan = document.getElementById('speed-value');
+
+        function generateArray() {
+            array = [];
+            for (let i = 0; i < arraySize; i++) {
+                array.push(Math.floor(Math.random() * 100) + 1);
+            }
+            renderArray();
+        }
+
+        function renderArray() {
+            arrayContainer.innerHTML = '';
+            const maxValue = Math.max(...array);
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${(value / maxValue) * 100}%`;
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = value;
+                bar.appendChild(label);
+                arrayContainer.appendChild(bar);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function insertionSort() {
+            const startTime = performance.now();
+            const bars = document.querySelectorAll('.bar');
+            for (let i = 1; i < array.length; i++) {
+                let key = array[i];
+                let j = i - 1;
+                bars[i].style.backgroundColor = 'red'; // 當前插入元素
+                await sleep(sortSpeed);
+                while (j >= 0 && array[j] > key) {
+                    bars[j].style.backgroundColor = 'yellow'; // 比較中
+                    await sleep(sortSpeed);
+                    array[j + 1] = array[j];
+                    bars[j + 1].style.height = `${(array[j + 1] / Math.max(...array)) * 100}%`;
+                    bars[j + 1].querySelector('.bar-label').textContent = array[j + 1];
+                    j--;
+                    if (j >= 0) bars[j + 1].style.backgroundColor = '#4CAF50';
+                }
+                array[j + 1] = key;
+                bars[j + 1].style.height = `${(key / Math.max(...array)) * 100}%`;
+                bars[j + 1].querySelector('.bar-label').textContent = key;
+                bars[j + 1].style.backgroundColor = 'blue'; // 已排序部分
+                await sleep(sortSpeed);
+                // 重置顏色
+                for (let k = 0; k <= i; k++) {
+                    if (k < i) bars[k].style.backgroundColor = 'blue';
+                    else bars[k].style.backgroundColor = 'green';
+                }
+            }
+            const endTime = performance.now();
+            timeSpan.textContent = ((endTime - startTime) / 1000).toFixed(2);
+        }
+
+        arraySizeSelect.addEventListener('change', () => {
+            arraySize = parseInt(arraySizeSelect.value);
+            generateArray();
+        });
+
+        generateBtn.addEventListener('click', generateArray);
+        sortBtn.addEventListener('click', () => {
+            insertionSort();
+        });
+
+        homeBtn.addEventListener('click', () => {
+            window.location.href = './';
+        });
+
+        speedInput.addEventListener('input', () => {
+            sortSpeed = 1000 - parseInt(speedInput.value) + 10;
+            speedValueSpan.textContent = (1000 / sortSpeed).toFixed(1);
+        });
+
+        // 初始化
+        generateArray();
+        speedValueSpan.textContent = (1000 / sortSpeed).toFixed(1);
+    </script>
+</body>
+</html>
