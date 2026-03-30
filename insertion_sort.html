@@ -10,10 +10,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            justify-content: flex-start;
+            min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            padding: 20px 0 24px;
+            box-sizing: border-box;
         }
         .container {
             display: flex;
@@ -87,6 +89,23 @@
             margin-right: 5px;
             border: 1px solid #ccc;
         }
+        .algorithm-intro {
+            width: 100%;
+            margin-top: 12px;
+            background-color: #ffffff;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 14px 16px;
+            box-sizing: border-box;
+        }
+        .algorithm-intro h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+        .algorithm-intro p {
+            margin: 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -129,6 +148,10 @@
                 <span>當前速度倍數: <span id="speed-value">1</span> 倍</span>
             </div>
         </div>
+        <section class="algorithm-intro" aria-label="插入排序介紹">
+            <h2>插入排序介紹</h2>
+            <p>插入排序會將元素逐一插入前方已排序區間中的正確位置。資料量小或近乎已排序時效率不錯，且實作簡單、空間複雜度為 O(1)，平均與最差時間複雜度為 O(n^2)。</p>
+        </section>
     </div>
 
     <script>
@@ -214,7 +237,7 @@
         });
 
         homeBtn.addEventListener('click', () => {
-            window.location.href = './';
+            window.location.href = 'index.html';
         });
 
         speedInput.addEventListener('input', () => {

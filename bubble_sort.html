@@ -5,13 +5,18 @@
     <title>氣泡排序法示範</title>
     <style>
         body, html {
-            height: 100%;
+            min-height: 100%;
             margin: 0;
+        }
+        body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 48px 16px 24px;
+            box-sizing: border-box;
         }
         #controls {
             margin-bottom: 20px;
@@ -21,12 +26,57 @@
             gap: 5px;
             align-items: flex-end;
             height: 50vh; /* 陣列區域最大佔據頁面高度一半 */
+            min-height: 320px;
+            width: min(90vw, 900px);
+            border: 1px solid #ccc;
+            background-color: white;
+            padding: 0 8px;
+            box-sizing: border-box;
         }
         .bar {
             width: 30px;
             background-color: #4CAF50;
             text-align: center;
             color: white;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            width: min(90vw, 900px);
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+        }
+        .algorithm-intro {
+            width: min(90vw, 900px);
+            margin-top: 12px;
+            background-color: #ffffff;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 14px 16px;
+            box-sizing: border-box;
+        }
+        .algorithm-intro h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+        .algorithm-intro p {
+            margin: 0;
+            line-height: 1.6;
         }
         #homeLink {
             position: absolute;
@@ -36,13 +86,35 @@
     </style>
 </head>
 <body>
-    <a id="homeLink" href="./" title="返回首頁">⬅️ 返回首頁</a>
+    <a id="homeLink" href="index.html" title="返回首頁">⬅️ 返回首頁</a>
     <div id="controls">
         陣列大小: <input type="number" id="sizeInput" min="2" max="10" value="5">
         <button id="generateBtn">生成陣列</button>
         <button id="sortBtn">開始排序</button>
     </div>
     <div id="arrayContainer"></div>
+    <div class="legend">
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #4CAF50;"></div>
+            <span>未排序</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #ef4444;"></div>
+            <span>比較中</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #f59e0b;"></div>
+            <span>交換中</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #16a34a;"></div>
+            <span>已完成</span>
+        </div>
+    </div>
+    <section class="algorithm-intro" aria-label="氣泡排序介紹">
+        <h2>氣泡排序介紹</h2>
+        <p>氣泡排序會反覆比較相鄰元素，若順序錯誤就交換，較大的值會像氣泡一樣逐步移到右側。此法概念直覺，平均與最差時間複雜度為 O(n^2)，適合用於教學與理解排序流程。</p>
+    </section>
 
     <script>
         const sizeInput = document.getElementById('sizeInput');
@@ -50,16 +122,33 @@
         const sortBtn = document.getElementById('sortBtn');
         const container = document.getElementById('arrayContainer');
         let arr = [];
+        let isSorting = false;
 
-        function renderArray() {
+        const COLORS = {
+            default: '#4CAF50',
+            comparing: '#ef4444',
+            swapping: '#f59e0b',
+            done: '#16a34a'
+        };
+
+        function buildSortedMap(startIndex) {
+            const sortedMap = {};
+            for (let i = startIndex; i < arr.length; i++) {
+                sortedMap[i] = COLORS.done;
+            }
+            return sortedMap;
+        }
+
+        function renderArray(highlightMap = {}) {
             container.innerHTML = '';
             if (arr.length === 0) return;
             const maxVal = Math.max(...arr);
-            arr.forEach(val => {
+            arr.forEach((val, index) => {
                 const bar = document.createElement('div');
                 bar.classList.add('bar');
                 const heightPercent = (val / maxVal) * 100;
                 bar.style.height = heightPercent + '%';
+                bar.style.backgroundColor = highlightMap[index] || COLORS.default;
                 bar.textContent = val;
                 container.appendChild(bar);
             });
@@ -79,16 +168,40 @@
         }
 
         async function bubbleSort() {
-            const bars = container.children;
+            if (isSorting) return;
+
+            isSorting = true;
+            generateBtn.disabled = true;
+            sortBtn.disabled = true;
+            sizeInput.disabled = true;
+
             for (let i = 0; i < arr.length; i++) {
                 for (let j = 0; j < arr.length - i - 1; j++) {
+                    const compareMap = buildSortedMap(arr.length - i);
+                    compareMap[j] = COLORS.comparing;
+                    compareMap[j + 1] = COLORS.comparing;
+                    renderArray(compareMap);
+                    await sleep(220);
+
                     if (arr[j] > arr[j + 1]) {
                         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                        renderArray();
-                        await sleep(300);
+                        const swapMap = buildSortedMap(arr.length - i);
+                        swapMap[j] = COLORS.swapping;
+                        swapMap[j + 1] = COLORS.swapping;
+                        renderArray(swapMap);
+                        await sleep(220);
                     }
                 }
+
+                renderArray(buildSortedMap(arr.length - i - 1));
+                await sleep(120);
             }
+
+            renderArray(buildSortedMap(0));
+            isSorting = false;
+            generateBtn.disabled = false;
+            sortBtn.disabled = false;
+            sizeInput.disabled = false;
         }
 
         generateBtn.addEventListener('click', generateArray);

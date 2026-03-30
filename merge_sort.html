@@ -10,11 +10,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
-            padding: 16px;
+            padding: 20px 16px 24px;
             box-sizing: border-box;
         }
 
@@ -103,6 +103,26 @@
             border: 1px solid #ccc;
         }
 
+        .algorithm-intro {
+            width: 100%;
+            margin-top: 12px;
+            background-color: #ffffff;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 14px 16px;
+            box-sizing: border-box;
+        }
+
+        .algorithm-intro h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .algorithm-intro p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
         @media (max-width: 768px) {
             .array-container {
                 height: 300px;
@@ -145,21 +165,33 @@
         </div>
         <div class="legend">
             <div class="legend-item">
+                <div class="color-box" style="background-color: #3b82f6;"></div>
+                <span>左半陣列</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #a855f7;"></div>
+                <span>右半陣列</span>
+            </div>
+            <div class="legend-item">
                 <div class="color-box" style="background-color: red;"></div>
                 <span>目前比較</span>
             </div>
             <div class="legend-item">
-                <div class="color-box" style="background-color: orange;"></div>
-                <span>目前寫回</span>
+                <div class="color-box" style="background-color: #f59e0b;"></div>
+                <span>暫存陣列寫回</span>
             </div>
             <div class="legend-item">
-                <div class="color-box" style="background-color: green;"></div>
+                <div class="color-box" style="background-color: #16a34a;"></div>
                 <span>已完成</span>
             </div>
             <div class="legend-item">
                 <span>當前速度倍數: <span id="speed-value">1</span> 倍</span>
             </div>
         </div>
+        <section class="algorithm-intro" aria-label="合併排序介紹">
+            <h2>合併排序介紹</h2>
+            <p>合併排序採用分治法，先將陣列切分成左右兩半遞迴排序，再透過暫存陣列合併回原陣列。其時間複雜度穩定為 O(n log n)，但需要額外 O(n) 空間。</p>
+        </section>
     </div>
 
     <script>
@@ -167,6 +199,15 @@
         let arraySize = 10;
         let sortSpeed = 100;
         let isSorting = false;
+
+        const COLORS = {
+            default: '#4CAF50',
+            leftPart: '#3b82f6',
+            rightPart: '#a855f7',
+            comparing: '#ef4444',
+            tempWrite: '#f59e0b',
+            done: '#16a34a'
+        };
 
         const arrayContainer = document.getElementById('array-container');
         const arraySizeSelect = document.getElementById('array-size');
@@ -195,7 +236,7 @@
                 const bar = document.createElement('div');
                 bar.className = 'bar';
                 bar.style.height = `${(value / maxValue) * 100}%`;
-                bar.style.backgroundColor = highlightMap[index] || '#4CAF50';
+                bar.style.backgroundColor = highlightMap[index] || COLORS.default;
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
@@ -204,6 +245,20 @@
                 bar.appendChild(label);
                 arrayContainer.appendChild(bar);
             });
+        }
+
+        function buildSegmentMap(left, mid, right) {
+            const segmentMap = {};
+
+            for (let idx = left; idx <= mid; idx++) {
+                segmentMap[idx] = COLORS.leftPart;
+            }
+
+            for (let idx = mid + 1; idx <= right; idx++) {
+                segmentMap[idx] = COLORS.rightPart;
+            }
+
+            return segmentMap;
         }
 
         function sleep(ms) {
@@ -226,15 +281,16 @@
         async function merge(left, mid, right) {
             const leftPart = array.slice(left, mid + 1);
             const rightPart = array.slice(mid + 1, right + 1);
+            const segmentMap = buildSegmentMap(left, mid, right);
 
             let i = 0;
             let j = 0;
             let k = left;
 
             while (i < leftPart.length && j < rightPart.length) {
-                const compareMap = {};
-                compareMap[left + i] = 'red';
-                compareMap[mid + 1 + j] = 'red';
+                const compareMap = { ...segmentMap };
+                compareMap[left + i] = COLORS.comparing;
+                compareMap[mid + 1 + j] = COLORS.comparing;
                 renderArray(compareMap);
                 await sleep(getDelay());
 
@@ -246,8 +302,8 @@
                     j++;
                 }
 
-                const writeMap = {};
-                writeMap[k] = 'orange';
+                const writeMap = { ...segmentMap };
+                writeMap[k] = COLORS.tempWrite;
                 renderArray(writeMap);
                 await sleep(getDelay());
                 k++;
@@ -255,8 +311,8 @@
 
             while (i < leftPart.length) {
                 array[k] = leftPart[i];
-                const writeMap = {};
-                writeMap[k] = 'orange';
+                const writeMap = { ...segmentMap };
+                writeMap[k] = COLORS.tempWrite;
                 renderArray(writeMap);
                 await sleep(getDelay());
                 i++;
@@ -265,8 +321,8 @@
 
             while (j < rightPart.length) {
                 array[k] = rightPart[j];
-                const writeMap = {};
-                writeMap[k] = 'orange';
+                const writeMap = { ...segmentMap };
+                writeMap[k] = COLORS.tempWrite;
                 renderArray(writeMap);
                 await sleep(getDelay());
                 j++;
@@ -287,7 +343,7 @@
 
             const doneMap = {};
             for (let i = 0; i < array.length; i++) {
-                doneMap[i] = 'green';
+                doneMap[i] = COLORS.done;
             }
             renderArray(doneMap);
             timeSpan.textContent = ((endTime - startTime) / 1000).toFixed(2);
