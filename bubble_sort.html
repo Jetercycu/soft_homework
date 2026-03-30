@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>氣泡排序法示範</title>
     <style>
         body, html {
@@ -15,34 +16,70 @@
             align-items: center;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            padding: 48px 16px 24px;
+            padding: 20px 16px 24px;
             box-sizing: border-box;
         }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: min(90vw, 900px);
+        }
+
+        h1 {
+            margin: 0 0 12px;
+        }
+
         #controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-sizing: border-box;
             margin-bottom: 20px;
         }
+
+        select, button, input {
+            padding: 8px 12px;
+            font-size: 16px;
+        }
+
+        .time-display {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
         #arrayContainer {
             display: flex;
             gap: 5px;
             align-items: flex-end;
             height: 50vh; /* 陣列區域最大佔據頁面高度一半 */
             min-height: 320px;
-            width: min(90vw, 900px);
+            width: 100%;
             border: 1px solid #ccc;
             background-color: white;
             padding: 0 8px;
             box-sizing: border-box;
         }
+
         .bar {
             width: 30px;
             background-color: #4CAF50;
             text-align: center;
             color: white;
+            transition: height 0.2s, background-color 0.2s;
         }
+
         .legend {
             display: flex;
             justify-content: center;
-            width: min(90vw, 900px);
+            width: 100%;
             padding: 10px;
             background-color: #f0f0f0;
             border-radius: 5px;
@@ -62,7 +99,7 @@
             border: 1px solid #ccc;
         }
         .algorithm-intro {
-            width: min(90vw, 900px);
+            width: 100%;
             margin-top: 12px;
             background-color: #ffffff;
             border: 1px solid #d4d4d4;
@@ -78,51 +115,83 @@
             margin: 0;
             line-height: 1.6;
         }
-        #homeLink {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+
+        @media (max-width: 768px) {
+            #arrayContainer {
+                min-height: 260px;
+                height: 42vh;
+            }
+
+            .bar {
+                width: 20px;
+                font-size: 12px;
+            }
+
+            .time-display {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-    <a id="homeLink" href="index.html" title="返回首頁">⬅️ 返回首頁</a>
-    <div id="controls">
-        陣列大小: <input type="number" id="sizeInput" min="2" max="10" value="5">
-        <button id="generateBtn">生成陣列</button>
-        <button id="sortBtn">開始排序</button>
+    <div class="container">
+        <h1>氣泡排序法示範</h1>
+        <div id="controls">
+            <label for="sizeInput">陣列數量:</label>
+            <select id="sizeInput">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+            <button id="generateBtn">生成新陣列</button>
+            <button id="sortBtn">開始排序</button>
+            <label for="speed">排序速度倍數:</label>
+            <input type="range" id="speed" min="10" max="1000" value="100" step="10">
+            <button id="homeBtn">回首頁</button>
+            <div class="time-display">花費時間: <span id="time">0</span> 秒</div>
+        </div>
+        <div id="arrayContainer"></div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #4CAF50;"></div>
+                <span>未排序</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #ef4444;"></div>
+                <span>比較中</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #f59e0b;"></div>
+                <span>交換中</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #16a34a;"></div>
+                <span>已完成</span>
+            </div>
+            <div class="legend-item">
+                <span>當前速度倍數: <span id="speed-value">1</span> 倍</span>
+            </div>
+        </div>
+        <section class="algorithm-intro" aria-label="氣泡排序介紹">
+            <h2>氣泡排序介紹</h2>
+            <p>氣泡排序會反覆比較相鄰元素，若順序錯誤就交換，較大的值會像氣泡一樣逐步移到右側。此法概念直覺，平均與最差時間複雜度為 O(n^2)，適合用於教學與理解排序流程。</p>
+        </section>
     </div>
-    <div id="arrayContainer"></div>
-    <div class="legend">
-        <div class="legend-item">
-            <div class="color-box" style="background-color: #4CAF50;"></div>
-            <span>未排序</span>
-        </div>
-        <div class="legend-item">
-            <div class="color-box" style="background-color: #ef4444;"></div>
-            <span>比較中</span>
-        </div>
-        <div class="legend-item">
-            <div class="color-box" style="background-color: #f59e0b;"></div>
-            <span>交換中</span>
-        </div>
-        <div class="legend-item">
-            <div class="color-box" style="background-color: #16a34a;"></div>
-            <span>已完成</span>
-        </div>
-    </div>
-    <section class="algorithm-intro" aria-label="氣泡排序介紹">
-        <h2>氣泡排序介紹</h2>
-        <p>氣泡排序會反覆比較相鄰元素，若順序錯誤就交換，較大的值會像氣泡一樣逐步移到右側。此法概念直覺，平均與最差時間複雜度為 O(n^2)，適合用於教學與理解排序流程。</p>
-    </section>
 
     <script>
         const sizeInput = document.getElementById('sizeInput');
         const generateBtn = document.getElementById('generateBtn');
         const sortBtn = document.getElementById('sortBtn');
+        const homeBtn = document.getElementById('homeBtn');
+        const speedInput = document.getElementById('speed');
+        const timeSpan = document.getElementById('time');
+        const speedValueSpan = document.getElementById('speed-value');
         const container = document.getElementById('arrayContainer');
         let arr = [];
         let isSorting = false;
+        let sortSpeed = 100;
 
         const COLORS = {
             default: '#4CAF50',
@@ -155,16 +224,23 @@
         }
 
         function generateArray() {
-            const size = Math.min(10, Math.max(2, parseInt(sizeInput.value) || 2));
+            if (isSorting) return;
+
+            const size = Math.min(20, Math.max(5, parseInt(sizeInput.value, 10) || 10));
             arr = [];
             for (let i = 0; i < size; i++) {
                 arr.push(Math.floor(Math.random() * 90) + 10);
             }
             renderArray();
+            timeSpan.textContent = '0';
         }
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function getDelay() {
+            return 1010 - sortSpeed;
         }
 
         async function bubbleSort() {
@@ -175,29 +251,42 @@
             sortBtn.disabled = true;
             sizeInput.disabled = true;
 
+            const startTime = performance.now();
+
             for (let i = 0; i < arr.length; i++) {
+                let swapped = false;
+
                 for (let j = 0; j < arr.length - i - 1; j++) {
                     const compareMap = buildSortedMap(arr.length - i);
                     compareMap[j] = COLORS.comparing;
                     compareMap[j + 1] = COLORS.comparing;
                     renderArray(compareMap);
-                    await sleep(220);
+                    await sleep(getDelay());
 
                     if (arr[j] > arr[j + 1]) {
                         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        swapped = true;
+
                         const swapMap = buildSortedMap(arr.length - i);
                         swapMap[j] = COLORS.swapping;
                         swapMap[j + 1] = COLORS.swapping;
                         renderArray(swapMap);
-                        await sleep(220);
+                        await sleep(getDelay());
                     }
                 }
 
                 renderArray(buildSortedMap(arr.length - i - 1));
-                await sleep(120);
+                await sleep(Math.max(100, getDelay() / 2));
+
+                if (!swapped) {
+                    break;
+                }
             }
 
             renderArray(buildSortedMap(0));
+            const endTime = performance.now();
+            timeSpan.textContent = ((endTime - startTime) / 1000).toFixed(2);
+
             isSorting = false;
             generateBtn.disabled = false;
             sortBtn.disabled = false;
@@ -205,12 +294,18 @@
         }
 
         generateBtn.addEventListener('click', generateArray);
-        sortBtn.addEventListener('click', () => {
-            bubbleSort();
+        sortBtn.addEventListener('click', bubbleSort);
+        homeBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        speedInput.addEventListener('input', () => {
+            sortSpeed = parseInt(speedInput.value, 10);
+            speedValueSpan.textContent = (1000 / (1010 - sortSpeed)).toFixed(1);
         });
 
         // initialize
         generateArray();
+        speedValueSpan.textContent = (1000 / (1010 - sortSpeed)).toFixed(1);
     </script>
 </body>
 </html>
