@@ -191,6 +191,17 @@
 	</div>
 
 	<script>
+		function removeStrayTopTextNodes() {
+			const childNodes = Array.from(document.body.childNodes);
+			for (const node of childNodes) {
+				if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+					node.remove();
+				}
+			}
+		}
+
+		removeStrayTopTextNodes();
+
 		let array = [];
 		let arraySize = 10;
 		let sortSpeed = 100;
