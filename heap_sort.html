@@ -1,26 +1,4 @@
-eight = `${(value / maxValue) * 100}%`;
-                bar.style.backgroundColor = highlightMap[index] || COLORS.default;
 
-                const label = document.createElement('div');
-                label.className = 'bar-label';
-                label.textContent = value;
-
-                bar.appendChild(label);
-                arrayContainer.appendChild(bar);
-            });
-        }
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        function getDelay() {
-            return 1010 - sortSpeed;
-        }
-
-        async function heapify(heapSize, rootIndex, sortedStart) {
-            let largest = rootIndex;
-            const left = 2 * roo<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
