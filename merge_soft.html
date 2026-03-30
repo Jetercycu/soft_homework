@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合併排序法示範</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: min(90vw, 900px);
+        }
+
+        .array-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ccc;
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 0 8px;
+            box-sizing: border-box;
+        }
+
+        .bar {
+            width: 28px;
+            background-color: #4CAF50;
+            margin: 0 2px;
+            transition: height 0.2s, background-color 0.2s;
+            position: relative;
+        }
+
+        .bar-label {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-sizing: border-box;
+        }
+
+        select, button, input {
+            padding: 8px 12px;
+            font-size: 16px;
+        }
+
+        .time-display {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .array-container {
+                height: 300px;
+            }
+
+            .bar {
+                width: 20px;
+                margin: 0 1px;
+            }
+
+            .bar-label {
+                font-size: 10px;
+            }
+
+            .time-display {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>合併排序法示範</h1>
+        <div class="array-container" id="array-container"></div>
+        <div class="controls">
+            <label for="array-size">陣列數量:</label>
+            <select id="array-size">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+            <button id="generate-btn">生成新陣列</button>
+            <button id="sort-btn">開始排序</button>
+            <label for="speed">排序速度倍數:</label>
+            <input type="range" id="speed" min="10" max="1000" value="100" step="10">
+            <button id="home-btn">回首頁</button>
+            <div class="time-display">花費時間: <span id="time">0</span> 秒</div>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: red;"></div>
+                <span>目前比較</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: orange;"></div>
+                <span>目前寫回</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: green;"></div>
+                <span>已完成</span>
+            </div>
+            <div class="legend-item">
+                <span>當前速度倍數: <span id="speed-value">1</span> 倍</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let array = [];
+        let arraySize = 10;
+        let sortSpeed = 100;
+        let isSorting = false;
+
+        const arrayContainer = document.getElementById('array-container');
+        const arraySizeSelect = document.getElementById('array-size');
+        const generateBtn = document.getElementById('generate-btn');
+        const sortBtn = document.getElementById('sort-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const speedInput = document.getElementById('speed');
+        const timeSpan = document.getElementById('time');
+        const speedValueSpan = document.getElementById('speed-value');
+
+        function generateArray() {
+            if (isSorting) return;
+            array = [];
+            for (let i = 0; i < arraySize; i++) {
+                array.push(Math.floor(Math.random() * 100) + 1);
+            }
+            renderArray();
+            timeSpan.textContent = '0';
+        }
+
+        function renderArray(highlightMap = {}) {
+            arrayContainer.innerHTML = '';
+            const maxValue = Math.max(...array);
+
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${(value / maxValue) * 100}%`;
+                bar.style.backgroundColor = highlightMap[index] || '#4CAF50';
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = value;
+
+                bar.appendChild(label);
+                arrayContainer.appendChild(bar);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function getDelay() {
+            return 1010 - sortSpeed;
+        }
+
+        async function mergeSort(left, right) {
+            if (left >= right) return;
+
+            const mid = Math.floor((left + right) / 2);
+            await mergeSort(left, mid);
+            await mergeSort(mid + 1, right);
+            await merge(left, mid, right);
+        }
+
+        async function merge(left, mid, right) {
+            const leftPart = array.slice(left, mid + 1);
+            const rightPart = array.slice(mid + 1, right + 1);
+
+            let i = 0;
+            let j = 0;
+            let k = left;
+
+            while (i < leftPart.length && j < rightPart.length) {
+                const compareMap = {};
+                compareMap[left + i] = 'red';
+                compareMap[mid + 1 + j] = 'red';
+                renderArray(compareMap);
+                await sleep(getDelay());
+
+                if (leftPart[i] <= rightPart[j]) {
+                    array[k] = leftPart[i];
+                    i++;
+                } else {
+                    array[k] = rightPart[j];
+                    j++;
+                }
+
+                const writeMap = {};
+                writeMap[k] = 'orange';
+                renderArray(writeMap);
+                await sleep(getDelay());
+                k++;
+            }
+
+            while (i < leftPart.length) {
+                array[k] = leftPart[i];
+                const writeMap = {};
+                writeMap[k] = 'orange';
+                renderArray(writeMap);
+                await sleep(getDelay());
+                i++;
+                k++;
+            }
+
+            while (j < rightPart.length) {
+                array[k] = rightPart[j];
+                const writeMap = {};
+                writeMap[k] = 'orange';
+                renderArray(writeMap);
+                await sleep(getDelay());
+                j++;
+                k++;
+            }
+        }
+
+        async function startMergeSort() {
+            if (isSorting) return;
+            isSorting = true;
+            sortBtn.disabled = true;
+            generateBtn.disabled = true;
+            arraySizeSelect.disabled = true;
+
+            const startTime = performance.now();
+            await mergeSort(0, array.length - 1);
+            const endTime = performance.now();
+
+            const doneMap = {};
+            for (let i = 0; i < array.length; i++) {
+                doneMap[i] = 'green';
+            }
+            renderArray(doneMap);
+            timeSpan.textContent = ((endTime - startTime) / 1000).toFixed(2);
+
+            isSorting = false;
+            sortBtn.disabled = false;
+            generateBtn.disabled = false;
+            arraySizeSelect.disabled = false;
+        }
+
+        arraySizeSelect.addEventListener('change', () => {
+            arraySize = parseInt(arraySizeSelect.value, 10);
+            generateArray();
+        });
+
+        speedInput.addEventListener('input', () => {
+            sortSpeed = parseInt(speedInput.value, 10);
+            speedValueSpan.textContent = (1000 / (1010 - sortSpeed)).toFixed(1);
+        });
+
+        generateBtn.addEventListener('click', generateArray);
+        sortBtn.addEventListener('click', startMergeSort);
+        homeBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // 初始化
+        generateArray();
+        speedValueSpan.textContent = (1000 / (1010 - sortSpeed)).toFixed(1);
+    </script>
+</body>
+</html>
