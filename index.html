@@ -2,16 +2,91 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>排序算法示範</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序演算法示範</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin:0; font-family: Arial, sans-serif; }
+        /* 定義全域顏色變數，方便未來統一修改 */
+        :root {
+            --primary-color: #4a90e2;
+            --hover-color: #357abd;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* 建立置中的主視覺卡片 */
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 30px;
+            color: #666;
+            font-size: 15px;
+        }
+
+        /* 將連結排列成按鈕形式 */
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 14px 20px;
+            text-decoration: none;
+            color: white;
+            background-color: var(--primary-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
+        }
+
+        /* 加入滑鼠懸停 (Hover) 的微動畫效果 */
+        .nav-links a:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.35);
+        }
     </style>
 </head>
 <body>
-    <p>請點擊以下連結前往排序頁面：<br>
-    <a href="bubble_sort.html">氣泡排序</a><br>
-    <a href="selection_sort.html">選擇排序</a><br>
-    <a href="insertion_sort.html">插入排序</a></p>
+    <div class="container">
+        <h1>排序演算法示範</h1>
+        <p>請點擊以下按鈕前往對應的排序教學頁面：</p>
+        <div class="nav-links">
+            <a href="bubble_sort.html">氣泡排序 (Bubble Sort)</a>
+            <a href="selection_sort.html">選擇排序 (Selection Sort)</a>
+            <a href="insertion_sort.html">插入排序 (Insertion Sort)</a>
+        </div>
+    </div>
 </body>
 </html>
-
